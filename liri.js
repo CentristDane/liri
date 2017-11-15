@@ -1,6 +1,7 @@
 var request = require("request");
 var Twitter = require('twitter');
-var movieName = "batman";
+var movieName = "mr.nobody";
+var songName = "The Sign"
 var queryUrl;
 var Spotify = require('node-spotify-api');
 var fs = require("fs");
@@ -41,12 +42,13 @@ fs.readFile("random.txt", "utf8", function(error, data) {
 //// spotify
 
 function spotify() {
-    var songName = process.argv[3];
+   
     var spotify = new Spotify({
         id: "55ea33cf581c480f8fd6c50982fb2e34",
         secret: "4339151d63574e42ab3aa93a7375190b"
     });
 
+if (!process.argv[3]) {
     spotify.search({ type: 'track', query: songName }, function(err, data) {
         if (err) {
             return console.log('Error occurred: ' + err);
@@ -58,7 +60,29 @@ function spotify() {
         var res = str.replace("spotify:track:", "https://open.spotify.com/track/");
         console.log("Preview URL:  " + res);
     });
-}
+   }else {
+   	 songName = process.argv[3];
+    spotify.search({ type: 'track', query: songName }, function(err, data) {
+        if (err) {
+            return console.log('Error occurred: ' + err);
+        }
+        console.log("Song " + songName);
+        console.log("Artist Name:  " + data.tracks.items[1].artists[0].name);
+        console.log("Album Name:  " + data.tracks.items[1].album.name);
+        var str = data.tracks.items[1].uri;
+        var res = str.replace("spotify:track:", "https://open.spotify.com/track/");
+        console.log("Preview URL:  " + res);
+    });
+   }
+/////////////
+
+
+
+
+
+
+
+}// for the function
 
 
 
@@ -100,8 +124,7 @@ if (process.argv[2] === "my-tweets") {
 /// code for the IMDB call 
 
 function IMDB() {
-
-    if (process.argv[3] == "") {
+    if (!process.argv[3]) {
         /// this doesn't work 
         queryUrl = "http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&apikey=trilogy";
         request(queryUrl, function(error, response, body) {
@@ -117,6 +140,7 @@ function IMDB() {
         })
     } else {
         movieName = process.argv[3];
+        console.log('name')
         queryUrl = "http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&apikey=trilogy";
         request(queryUrl, function(error, response, body) {
             console.log(JSON.parse(body).Title);
